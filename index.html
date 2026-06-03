@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎪 Kermesse Tirage</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800;900&display=swap');
+:root{--red:#FF3B3B;--yellow:#FFD93D;--blue:#4CC9F0;--green:#6BCB77;--purple:#C77DFF;--orange:#FF9F1C;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;min-height:100dvh;background:#0d0520;font-family:'Nunito',sans-serif;overflow:hidden;}
+body{background:radial-gradient(circle at 20% 20%,rgba(255,59,59,.18) 0%,transparent 45%),radial-gradient(circle at 80% 75%,rgba(76,201,240,.15) 0%,transparent 45%),radial-gradient(circle at 50% 50%,rgba(199,125,255,.1) 0%,transparent 60%) ,#0d0520;}
+
+/* BUNTING */
+.bunting{display:flex;align-items:flex-start;justify-content:center;gap:3px;position:relative;padding-top:4px;width:100%;flex-shrink:0;}
+.bunting::before{content:'';position:absolute;top:4px;left:0;right:0;height:1px;background:rgba(255,217,61,.4);}
+.flag{width:20px;height:26px;clip-path:polygon(0 0,100% 0,100% 75%,50% 100%,0 75%);position:relative;top:4px;flex-shrink:0;}
+.flag:nth-child(odd){animation:sway 3s ease-in-out infinite;}
+.flag:nth-child(even){animation:sway 3s ease-in-out infinite reverse;}
+@keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+
+/* LAYOUT */
+.app{display:flex;flex-direction:column;align-items:center;height:100dvh;padding:env(safe-area-inset-top,12px) 0 env(safe-area-inset-bottom,12px);}
+
+.title{font-family:'Fredoka One',cursive;font-size:clamp(1.6rem,5vw,2.4rem);color:var(--yellow);text-shadow:3px 3px 0 var(--red),0 0 25px rgba(255,217,61,.4);text-align:center;animation:pulse 2s ease-in-out infinite;margin:6px 0 2px;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+.info{font-size:.75rem;color:rgba(255,255,255,.35);font-weight:700;text-align:center;margin-bottom:4px;}
+
+/* WINNERS STRIP */
+.strip{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;padding:4px 16px;max-height:48px;overflow-y:auto;width:100%;flex-shrink:0;}
+.strip::-webkit-scrollbar{display:none;}
+.wchip{background:rgba(107,203,119,.18);border:1px solid rgba(107,203,119,.35);color:var(--green);font-size:.6rem;font-weight:800;padding:2px 8px;border-radius:50px;}
+
+/* WHEEL */
+.wheel-area{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;}
+.wheel-wrap{position:relative;width:min(72vw,320px);height:min(72vw,320px);}
+.pointer{position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:30px solid var(--yellow);filter:drop-shadow(0 3px 6px rgba(255,217,61,.7));z-index:10;}
+#wheel{border-radius:50%;display:block;width:100%;height:100%;transition:box-shadow .15s;}
+#wheel.spinning{box-shadow:0 0 0 5px rgba(255,217,61,.8),0 0 0 12px rgba(255,59,59,.45),0 0 80px rgba(255,217,61,.4);}
+.hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:42px;height:42px;background:radial-gradient(circle at 40% 35%,#ffe566,var(--yellow));border-radius:50%;border:4px solid white;box-shadow:0 0 16px rgba(255,217,61,.6);display:flex;align-items:center;justify-content:center;font-size:1.1rem;z-index:5;}
+
+/* BOTTOM */
+.bottom{width:100%;padding:12px 20px 8px;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.04);border-top:1px solid rgba(255,255,255,.07);border-radius:24px 24px 0 0;flex-shrink:0;}
+.counts{display:flex;gap:8px;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.4);}
+.counts span{background:rgba(255,255,255,.08);padding:2px 12px;border-radius:50px;}
+
+.btn-spin{width:100%;font-family:'Fredoka One',cursive;font-size:1.3rem;padding:15px;border:none;border-radius:16px;background:linear-gradient(135deg,var(--red),var(--orange));color:white;cursor:pointer;box-shadow:0 6px 0 #b32020,0 10px 28px rgba(255,59,59,.4);position:relative;overflow:hidden;letter-spacing:.5px;text-shadow:1px 2px 0 rgba(0,0,0,.2);}
+.btn-spin::after{content:'';position:absolute;top:0;left:-80%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transform:skewX(-20deg);animation:shine 2.5s infinite;}
+@keyframes shine{0%{left:-80%}40%,100%{left:160%}}
+.btn-spin:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 #b32020;}
+.btn-spin:disabled{opacity:.45;cursor:not-allowed;}
+.btn-reset{background:none;border:1.5px solid rgba(255,100,100,.25);color:rgba(255,100,100,.5);font-family:'Nunito',sans-serif;font-weight:700;font-size:.72rem;padding:7px 20px;border-radius:50px;cursor:pointer;width:100%;}
+.btn-reset:active{border-color:var(--red);color:var(--red);}
+
+/* FIREWORKS */
+#fw{position:fixed;inset:0;pointer-events:none;z-index:50;}
+
+/* WINNER OVERLAY */
+.overlay{position:fixed;inset:0;background:rgba(13,5,32,.9);backdrop-filter:blur(10px);z-index:80;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;}
+.overlay.show{display:flex;animation:fadeIn .4s ease;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.wcard{animation:pop .55s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pop{from{transform:scale(.2) rotate(-8deg);opacity:0}to{transform:scale(1);opacity:1}}
+.trophy{font-size:4.5rem;display:block;animation:trophyAnim 1.2s ease-in-out infinite;}
+@keyframes trophyAnim{0%,100%{transform:rotate(-8deg) scale(1)}50%{transform:rotate(8deg) scale(1.1)}}
+.wlabel{font-family:'Fredoka One',cursive;font-size:.95rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:3px;margin:6px 0;}
+.wname{font-family:'Fredoka One',cursive;font-size:clamp(2rem,7vw,2.8rem);color:var(--yellow);line-height:1.1;text-shadow:3px 3px 0 var(--orange),0 0 50px rgba(255,217,61,.7);animation:glow 1.5s ease-in-out infinite;word-break:break-word;}
+@keyframes glow{0%,100%{text-shadow:3px 3px 0 var(--orange),0 0 50px rgba(255,217,61,.7)}50%{text-shadow:3px 3px 0 var(--orange),0 0 90px rgba(255,217,61,1)}}
+.wticket{font-size:.82rem;color:rgba(255,255,255,.4);margin-top:5px;}
+.wrem{font-size:.78rem;color:rgba(255,255,255,.3);margin-top:3px;}
+.btn-close{margin-top:28px;font-family:'Fredoka One',cursive;font-size:1.05rem;padding:13px 40px;border:none;border-radius:16px;background:linear-gradient(135deg,var(--blue),var(--purple));color:white;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.3),0 10px 25px rgba(76,201,240,.3);}
+.btn-close:active{transform:translateY(3px);}
+</style>
+</head>
+<body>
+<canvas id="fw"></canvas>
+<div class="overlay" id="overlay">
+  <div class="wcard">
+    <span class="trophy">🏆</span>
+    <div class="wlabel">✨ Grand Gagnant ✨</div>
+    <div class="wname" id="wname"></div>
+    <div class="wticket" id="wticket"></div>
+    <div class="wrem" id="wrem"></div>
+    <button class="btn-close" onclick="closeWinner()">🎉 Continuer !</button>
+  </div>
+</div>
+
+<div class="app">
+  <div class="bunting" id="bunting"></div>
+  <div class="title">🎪 Tirage au Sort</div>
+  <div class="info" id="info"></div>
+  <div class="strip" id="strip"></div>
+  <div class="wheel-area">
+    <div class="wheel-wrap" id="wrapEl">
+      <div class="pointer"></div>
+      <canvas id="wheel"></canvas>
+      <div class="hub">🎯</div>
+    </div>
+  </div>
+  <div class="bottom">
+    <div class="counts"><span id="remCount"></span><span id="drawnCount"></span></div>
+    <button class="btn-spin" id="spinBtn" onclick="spin()">🎰 Lancer le tirage !</button>
+    <button class="btn-reset" onclick="resetAll()">🔄 Réinitialiser tous les tirages</button>
+  </div>
+</div>
+
+<script>
+const TICKETS=["Valérie Delmas — billet 1","Valérie Delmas — billet 2","Valérie Delmas — billet 3","Valérie Delmas — billet 4","Valérie Delmas — billet 5","Elise Bisbau — billet 1","Elise Bisbau — billet 2","Elise Bisbau — billet 3","Elise Bisbau — billet 4","Elise Bisbau — billet 5","Elise Bisbau — billet 6","Elise Bisbau — billet 7","Elise Bisbau — billet 8","Elise Bisbau — billet 9","Elise Bisbau — billet 10","Emilie Bisbau — billet 1","Emilie Bisbau — billet 2","Emilie Bisbau — billet 3","Emilie Bisbau — billet 4","Emilie Bisbau — billet 5","Catherine Combet — billet 1","Catherine Combet — billet 2","Catherine Combet — billet 3","Catherine Combet — billet 4","Catherine Combet — billet 5","Pauline Richard — billet 1","Pauline Richard — billet 2","Pauline Richard — billet 3","Pauline Richard — billet 4","Pauline Richard — billet 5","Juliane Wudler — billet 1","Juliane Wudler — billet 2","Juliane Wudler — billet 3","Juliane Wudler — billet 4","Juliane Wudler — billet 5","Aurélie Pitois — billet 1","Aurélie Pitois — billet 2","Aurélie Pitois — billet 3","Aurélie Pitois — billet 4","Aurélie Pitois — billet 5","Hélène Vives — billet 1","Hélène Vives — billet 2","Enzo Mugüet — billet 1","Enzo Mugüet — billet 2","Enzo Mugüet — billet 3","Enzo Mugüet — billet 4","Enzo Mugüet — billet 5","Enzo Mugüet — billet 6","Enzo Mugüet — billet 7","Enzo Mugüet — billet 8","Enzo Mugüet — billet 9","Enzo Mugüet — billet 10","Sebastien Saint Cricq — billet 1","Jessie Brahim — billet 1","Jessie Brahim — billet 2","Jessie Brahim — billet 3","Jessie Brahim — billet 4","Jessie Brahim — billet 5","Jessie Brahim — billet 6","Jessie Brahim — billet 7","Jessie Brahim — billet 8","Jessie Brahim — billet 9","Jessie Brahim — billet 10","Stéphane Galvez — billet 1","Stéphane Galvez — billet 2","Fanny Etchemendy — billet 1","Fanny Etchemendy — billet 2","Fanny Etchemendy — billet 3","Carl Rouzier — billet 1","Carl Rouzier — billet 2","Carl Rouzier — billet 3","Carl Rouzier — billet 4","Carl Rouzier — billet 5","Carl Rouzier — billet 6","Carl Rouzier — billet 7","Carl Rouzier — billet 8","Carl Rouzier — billet 9","Carl Rouzier — billet 10","Alice Falchetti — billet 1","Alice Falchetti — billet 2","Alice Falchetti — billet 3","Alice Falchetti — billet 4","Alice Falchetti — billet 5","Cecilia Camaño — billet 1","Cecilia Camaño — billet 2","Cecilia Camaño — billet 3","Cecilia Camaño — billet 4","Cecilia Camaño — billet 5","Celine Combet — billet 1","Celine Combet — billet 2","Celine Combet — billet 3","Celine Combet — billet 4","Celine Combet — billet 5","Thibaut Camberlin — billet 1","Thibaut Camberlin — billet 2","Thibaut Camberlin — billet 3","Thibaut Camberlin — billet 4","Thibaut Camberlin — billet 5","Thibaut Camberlin — billet 6","Thibaut Camberlin — billet 7","Thibaut Camberlin — billet 8","Thibaut Camberlin — billet 9","Thibaut Camberlin — billet 10","Marie Danguin-Caillaba — billet 1","Marie Danguin-Caillaba — billet 2","Marie Danguin-Caillaba — billet 3","Marie Danguin-Caillaba — billet 4","Marie Danguin-Caillaba — billet 5","Marie Danguin-Caillaba — billet 6","Marie Danguin-Caillaba — billet 7","Marie Danguin-Caillaba — billet 8","Marie Danguin-Caillaba — billet 9","Marie Danguin-Caillaba — billet 10","Anais Vidalenc — billet 1","Anais Vidalenc — billet 2","Anais Vidalenc — billet 3","Anais Vidalenc — billet 4","Anais Vidalenc — billet 5","Prunelle Dupré — billet 1","Prunelle Dupré — billet 2","Prunelle Dupré — billet 3","Prunelle Dupré — billet 4","Prunelle Dupré — billet 5","Prunelle Dupré — billet 6","Prunelle Dupré — billet 7","Prunelle Dupré — billet 8","Prunelle Dupré — billet 9","Prunelle Dupré — billet 10","Anne Benetea — billet 1","Anne Benetea — billet 2","Anne Benetea — billet 3","Anne Benetea — billet 4","Anne Benetea — billet 5","Anne Benetea — billet 6","Anne Benetea — billet 7","Anne Benetea — billet 8","Anne Benetea — billet 9","Anne Benetea — billet 10","Baptiste Sallaberry — billet 1","Baptiste Sallaberry — billet 2","Baptiste Sallaberry — billet 3","Baptiste Sallaberry — billet 4","Baptiste Sallaberry — billet 5","Jerome Tarascon — billet 1","Jerome Tarascon — billet 2","Jerome Tarascon — billet 3","Jerome Tarascon — billet 4","Jerome Tarascon — billet 5","Hélène Prévost — billet 1","Hélène Prévost — billet 2","Hélène Prévost — billet 3","Hélène Prévost — billet 4","Hélène Prévost — billet 5","Janet Okoumou — billet 1","Janet Okoumou — billet 2","Janet Okoumou — billet 3","Janet Okoumou — billet 4","Janet Okoumou — billet 5","Janet Okoumou — billet 6","Janet Okoumou — billet 7","Janet Okoumou — billet 8","Janet Okoumou — billet 9","Janet Okoumou — billet 10","Clémentine Koenig — billet 1","Clémentine Koenig — billet 2","Clémentine Koenig — billet 3","Clémentine Koenig — billet 4","Clémentine Koenig — billet 5","Sabine Cantais — billet 1","Sabine Cantais — billet 2","Sabine Cantais — billet 3","Sabine Cantais — billet 4","Sabine Cantais — billet 5","Sylviane Merlino — billet 1","Sylviane Merlino — billet 2","Sylviane Merlino — billet 3","Sylviane Merlino — billet 4","Sylviane Merlino — billet 5","Georges Desmousseaux — billet 1","Georges Desmousseaux — billet 2","Georges Desmousseaux — billet 3","Georges Desmousseaux — billet 4","Georges Desmousseaux — billet 5","Georges Desmousseaux — billet 6","Georges Desmousseaux — billet 7","Georges Desmousseaux — billet 8","Georges Desmousseaux — billet 9","Georges Desmousseaux — billet 10","Georges Desmousseaux — billet 11","Georges Desmousseaux — billet 12","Georges Desmousseaux — billet 13","Georges Desmousseaux — billet 14","Georges Desmousseaux — billet 15","Georges Desmousseaux — billet 16","Georges Desmousseaux — billet 17","Georges Desmousseaux — billet 18","Georges Desmousseaux — billet 19","Georges Desmousseaux — billet 20","Pascal Beneteau — billet 1","Pascal Beneteau — billet 2","Pascal Beneteau — billet 3","Pascal Beneteau — billet 4","Pascal Beneteau — billet 5","Lucas Meunier — billet 1","Alexis Le Cann — billet 1","Patrick Nguyen — billet 1","Patrick Nguyen — billet 2","Patrick Nguyen — billet 3","Patrick Nguyen — billet 4","Patrick Nguyen — billet 5","Laurie Le Séhan — billet 1","Laurie Le Séhan — billet 2","Laurie Le Séhan — billet 3","Laurie Le Séhan — billet 4","Laurie Le Séhan — billet 5","Claudine Hugron — billet 1","Claudine Hugron — billet 2","Claudine Hugron — billet 3","Claudine Hugron — billet 4","Claudine Hugron — billet 5","Amaia Giroud Piffoz — billet 1","Amaia Giroud Piffoz — billet 2","Amaia Giroud Piffoz — billet 3","Amaia Giroud Piffoz — billet 4","Amaia Giroud Piffoz — billet 5","Joachim Vaccari — billet 1","Joachim Vaccari — billet 2","Joachim Vaccari — billet 3","Joachim Vaccari — billet 4","Evelyne Ducasse — billet 1","Evelyne Ducasse — billet 2","Evelyne Ducasse — billet 3","Evelyne Ducasse — billet 4","Evelyne Ducasse — billet 5","Kevin Ducasse — billet 1","Kevin Ducasse — billet 2","Kevin Ducasse — billet 3","Kevin Ducasse — billet 4","Kevin Ducasse — billet 5","Mathilde Lhuillier — billet 1","Mathilde Lhuillier — billet 2","Mathilde Lhuillier — billet 3","Mathilde Lhuillier — billet 4","Mathilde Lhuillier — billet 5","Numerobis Marraud Des Grottes — billet 1","Numerobis Marraud Des Grottes — billet 2","Numerobis Marraud Des Grottes — billet 3","Numerobis Marraud Des Grottes — billet 4","Numerobis Marraud Des Grottes — billet 5","Simon Marraud Des Grottes — billet 1","Simon Marraud Des Grottes — billet 2","Simon Marraud Des Grottes — billet 3","Simon Marraud Des Grottes — billet 4","Simon Marraud Des Grottes — billet 5","Lesly Audiot — billet 1","Lesly Audiot — billet 2","Lesly Audiot — billet 3","Lesly Audiot — billet 4","Lesly Audiot — billet 5","Lesly Audiot — billet 6","Lesly Audiot — billet 7","Lesly Audiot — billet 8","Lesly Audiot — billet 9","Lesly Audiot — billet 10","Marie France Tessier — billet 1","Marie France Tessier — billet 2","Marie France Tessier — billet 3","Vanessa Goncalves De Carvalho — billet 1","Vanessa Goncalves De Carvalho — billet 2","Vanessa Goncalves De Carvalho — billet 3","Vanessa Goncalves De Carvalho — billet 4","Vanessa Goncalves De Carvalho — billet 5","Lila Duplessis — billet 1","Lila Duplessis — billet 2","Lila Duplessis — billet 3","Lila Duplessis — billet 4","Lila Duplessis — billet 5","Solange Vivès — billet 1","Solange Vivès — billet 2","Solange Vivès — billet 3","Solange Vivès — billet 4","Solange Vivès — billet 5","Louis Vives — billet 1","Louis Vives — billet 2","Louis Vives — billet 3","Louis Vives — billet 4","Louis Vives — billet 5","Schekynael Villieres — billet 1","Schekynael Villieres — billet 2","Schekynael Villieres — billet 3","Schekynael Villieres — billet 4","Schekynael Villieres — billet 5","Schekynael Villieres — billet 6","Schekynael Villieres — billet 7","Schekynael Villieres — billet 8","Schekynael Villieres — billet 9","Schekynael Villieres — billet 10","Dany Larrouy — billet 1","Dany Larrouy — billet 2","Dany Larrouy — billet 3","Dany Larrouy — billet 4","Dany Larrouy — billet 5","Dominique Dauvergne — billet 1","Dominique Dauvergne — billet 2","Dominique Dauvergne — billet 3","Dominique Dauvergne — billet 4","Dominique Dauvergne — billet 5","Oihana Hirigoyen — billet 1","Oihana Hirigoyen — billet 2","Oihana Hirigoyen — billet 3","Oihana Hirigoyen — billet 4","Oihana Hirigoyen — billet 5","Oihana Hirigoyen — billet 6","Oihana Hirigoyen — billet 7","Oihana Hirigoyen — billet 8","Oihana Hirigoyen — billet 9","Oihana Hirigoyen — billet 10","Oihana Hirigoyen — billet 11","Oihana Hirigoyen — billet 12","Oihana Hirigoyen — billet 13","Oihana Hirigoyen — billet 14","Oihana Hirigoyen — billet 15","Lucie Etchemendy — billet 1","Lucie Etchemendy — billet 2","Lucie Etchemendy — billet 3","Lucie Etchemendy — billet 4","Lucie Etchemendy — billet 5","Pauline Etchemendy — billet 1","Pauline Etchemendy — billet 2","Pauline Etchemendy — billet 3","Pauline Etchemendy — billet 4","Pauline Etchemendy — billet 5","Jovan Camelin Milovic — billet 1","Jovan Camelin Milovic — billet 2","Jovan Camelin Milovic — billet 3","Jovan Camelin Milovic — billet 4","Jovan Camelin Milovic — billet 5","Sophie Camelin Milovic — billet 1","Sophie Camelin Milovic — billet 2","Sophie Camelin Milovic — billet 3","Sophie Camelin Milovic — billet 4","Sophie Camelin Milovic — billet 5","Brice Camelin — billet 1","Brice Camelin — billet 2","Brice Camelin — billet 3","Brice Camelin — billet 4","Brice Camelin — billet 5","Benjamin Amestoy — billet 1","Benjamin Amestoy — billet 2","Benjamin Amestoy — billet 3","Benjamin Amestoy — billet 4","Benjamin Amestoy — billet 5","Benjamin Amestoy — billet 6","Benjamin Amestoy — billet 7","Benjamin Amestoy — billet 8","Benjamin Amestoy — billet 9","Benjamin Amestoy — billet 10","Baptiste Amand — billet 1","Baptiste Amand — billet 2","Baptiste Amand — billet 3","Baptiste Amand — billet 4","Baptiste Amand — billet 5","Baptiste Amand — billet 6","Baptiste Amand — billet 7","Baptiste Amand — billet 8","Baptiste Amand — billet 9","Baptiste Amand — billet 10","Baptiste Amand — billet 11","Baptiste Amand — billet 12","Baptiste Amand — billet 13","Baptiste Amand — billet 14","Baptiste Amand — billet 15","Virginie Madelin — billet 1","Virginie Madelin — billet 2","Virginie Madelin — billet 3","Virginie Madelin — billet 4","Virginie Madelin — billet 5","Virginie Madelin — billet 6","Virginie Madelin — billet 7","Virginie Madelin — billet 8","Virginie Madelin — billet 9","Virginie Madelin — billet 10","Alix Lasserre — billet 1","Alix Lasserre — billet 2","Alix Lasserre — billet 3","Alix Lasserre — billet 4","Alix Lasserre — billet 5","Mila Lasserre — billet 1","Mila Lasserre — billet 2","Mila Lasserre — billet 3","Mila Lasserre — billet 4","Mila Lasserre — billet 5","Guillaume Vinsous — billet 1","Guillaume Vinsous — billet 2","Guillaume Vinsous — billet 3","Guillaume Vinsous — billet 4","Guillaume Vinsous — billet 5","Guillaume Vinsous — billet 6","Guillaume Vinsous — billet 7","Guillaume Vinsous — billet 8","Guillaume Vinsous — billet 9","Guillaume Vinsous — billet 10","Reda Saad — billet 1","Reda Saad — billet 2","Reda Saad — billet 3","Reda Saad — billet 4","Reda Saad — billet 5","Livia Merlino — billet 1","Livia Merlino — billet 2","Livia Merlino — billet 3","Livia Merlino — billet 4","Livia Merlino — billet 5","Livia Merlino — billet 6","Livia Merlino — billet 7","Livia Merlino — billet 8","Livia Merlino — billet 9","Livia Merlino — billet 10","Stéphanie Constantin — billet 1","Stéphanie Constantin — billet 2","Stéphanie Constantin — billet 3","Stéphanie Constantin — billet 4","Stéphanie Constantin — billet 5","Stéphanie Constantin — billet 6","Stéphanie Constantin — billet 7","Stéphanie Constantin — billet 8","Stéphanie Constantin — billet 9","Stéphanie Constantin — billet 10","Gabi Vanz — billet 1","Gabi Vanz — billet 2","Gabi Vanz — billet 3","Gabi Vanz — billet 4","Gabi Vanz — billet 5","Gabi Vanz — billet 6","Gabi Vanz — billet 7","Gabi Vanz — billet 8","Gabi Vanz — billet 9","Gabi Vanz — billet 10","Gabi Vanz — billet 11","Gabi Vanz — billet 12","Gabi Vanz — billet 13","Gabi Vanz — billet 14","Gabi Vanz — billet 15","Gabi Vanz — billet 16","Gabi Vanz — billet 17","Gabi Vanz — billet 18","Gabi Vanz — billet 19","Gabi Vanz — billet 20","Gabi Vanz — billet 21","Gabi Vanz — billet 22","Gabi Vanz — billet 23","Gabi Vanz — billet 24","Gabi Vanz — billet 25","Iris Bénard — billet 1","Iris Bénard — billet 2","Iris Bénard — billet 3","Iris Bénard — billet 4","Iris Bénard — billet 5","Iris Bénard — billet 6","Iris Bénard — billet 7","Iris Bénard — billet 8","Iris Bénard — billet 9","Iris Bénard — billet 10","Joachim Vaccari — billet 5","Joachim Vaccari — billet 6","Joachim Vaccari — billet 7","Joachim Vaccari — billet 8","Joachim Vaccari — billet 9"];
+
+const COLORS=["#FF3B3B","#FFD93D","#4CC9F0","#6BCB77","#C77DFF","#FF9F1C","#FF6BD6","#FF8F70","#7BE8D5","#A8FF78"];
+const BUNTING=["#FF3B3B","#FFD93D","#4CC9F0","#6BCB77","#C77DFF","#FF9F1C","#FF6BD6"];
+
+let drawn=[], spinning=false, angle=0, raf;
+
+// Bunting
+const b=document.getElementById('bunting');
+for(let i=0;i<26;i++){const f=document.createElement('div');f.className='flag';f.style.background=BUNTING[i%BUNTING.length];b.appendChild(f);}
+
+function remaining(){return TICKETS.map((_,i)=>i).filter(i=>!drawn.includes(i));}
+
+function updateUI(){
+  const rem=remaining();
+  document.getElementById('info').textContent=TICKETS.length+' billets — '+rem.length+' restant'+(rem.length>1?'s':'');
+  document.getElementById('remCount').textContent='🎟️ '+rem.length+' restant'+(rem.length>1?'s':'');
+  document.getElementById('drawnCount').textContent='✅ '+drawn.length+' tiré'+(drawn.length>1?'s':'');
+  const strip=document.getElementById('strip');
+  strip.innerHTML=drawn.map(i=>`<span class="wchip">🏆 ${TICKETS[i].split(' — ')[0]}</span>`).join('');
+  const btn=document.getElementById('spinBtn');
+  if(rem.length===0){btn.disabled=true;btn.textContent='🎊 Tous les billets tirés !';}
+  else{btn.disabled=false;btn.textContent='🎰 Lancer le tirage !';}
+}
+
+// Canvas setup
+const canvas=document.getElementById('wheel');
+function resizeCanvas(){
+  const w=document.getElementById('wrapEl').offsetWidth;
+  canvas.width=w; canvas.height=w;
+}
+resizeCanvas();
+window.addEventListener('resize',()=>{resizeCanvas();drawWheel();});
+
+function drawWheel(hi=-1){
+  const rem=remaining();
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, cx=W/2, r=cx-6;
+  ctx.clearRect(0,0,W,W);
+  if(rem.length===0){
+    const g=ctx.createRadialGradient(cx,cx,0,cx,cx,r);
+    g.addColorStop(0,'#2a1060');g.addColorStop(1,'#1a0a3e');
+    ctx.beginPath();ctx.arc(cx,cx,r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+    ctx.strokeStyle='rgba(107,203,119,.6)';ctx.lineWidth=4;ctx.stroke();
+    ctx.fillStyle='rgba(107,203,119,.9)';ctx.font='bold 14px Nunito,sans-serif';ctx.textAlign='center';
+    ctx.fillText('🎊 Tous tirés !',cx,cx);return;
+  }
+  const n=rem.length, sl=(Math.PI*2)/n;
+  rem.forEach((idx,pos)=>{
+    const sa=angle+pos*sl, ea=sa+sl, isW=idx===hi;
+    ctx.beginPath();ctx.moveTo(cx,cx);ctx.arc(cx,cx,r,sa,ea);ctx.closePath();
+    if(isW){ctx.fillStyle='#fff';ctx.shadowColor='#fff';ctx.shadowBlur=25;ctx.fill();ctx.shadowBlur=0;}
+    else{ctx.fillStyle=COLORS[pos%COLORS.length];ctx.fill();}
+    ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.save();ctx.translate(cx,cx);ctx.rotate(sa+sl/2);
+    const name=TICKETS[idx].split(' — ')[0];
+    const maxL=n<=8?13:n<=16?9:6;
+    const lbl=name.length>maxL?name.slice(0,maxL-1)+'…':name;
+    const fs=n<=6?12:n<=14?10:n<=24?8:6;
+    ctx.font=`bold ${fs}px Nunito,sans-serif`;
+    ctx.fillStyle=isW?'#FF6B00':'rgba(255,255,255,.95)';
+    ctx.textAlign='right';ctx.textBaseline='middle';
+    ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=2;
+    ctx.fillText(lbl,r-10,0);ctx.restore();
+  });
+  ctx.beginPath();ctx.arc(cx,cx,r,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,217,61,.55)';ctx.lineWidth=4;ctx.stroke();
+}
+
+function spin(){
+  if(spinning)return;
+  const rem=remaining();if(rem.length===0)return;
+  spinning=true;
+  document.getElementById('spinBtn').disabled=true;
+  canvas.classList.add('spinning');
+  const wi=rem[Math.floor(Math.random()*rem.length)];
+  const pos=rem.indexOf(wi), n=rem.length, sl=(Math.PI*2)/n;
+  const target=angle+(-Math.PI/2-(pos*sl+sl/2))+(5+Math.random()*3)*Math.PI*2;
+  const dur=3000, t0=performance.now(), a0=angle;
+  function ease(t){if(t<.2)return 2.5*t*t;const t2=(t-.2)/.8;return .5+.5*(1-Math.pow(1-t2,5));}
+  function anim(now){
+    const t=Math.min((now-t0)/dur,1);
+    angle=a0+(target-a0)*ease(t);drawWheel();
+    if(t<1){raf=requestAnimationFrame(anim);}
+    else{
+      angle=target;spinning=false;canvas.classList.remove('spinning');drawWheel(wi);
+      // shake
+      const wrap=document.getElementById('wrapEl');
+      const offs=[10,-10,8,-8,5,-5,3,-3,0];let i=0;
+      const sh=setInterval(()=>{
+        if(i>=offs.length){clearInterval(sh);wrap.style.transform='';
+          drawn.push(wi);updateUI();showWinner(wi);}
+        else{wrap.style.transform=`translateX(${offs[i++]}px)`;}
+      },45);
+    }
+  }
+  cancelAnimationFrame(raf);requestAnimationFrame(anim);
+}
+
+function showWinner(idx){
+  const rem=remaining().length;
+  document.getElementById('wname').textContent=TICKETS[idx].split(' — ')[0];
+  document.getElementById('wticket').textContent='🎟️ '+TICKETS[idx].split(' — ')[1];
+  document.getElementById('wrem').textContent=rem>0?rem+' billet'+(rem>1?'s':'')+' encore en jeu':'🎊 Tous les billets tirés !';
+  document.getElementById('overlay').classList.add('show');
+  startFW();
+}
+function closeWinner(){document.getElementById('overlay').classList.remove('show');stopFW();}
+function resetAll(){if(!confirm('Réinitialiser tous les tirages ?'))return;drawn=[];updateUI();drawWheel();}
+
+// Fireworks
+const fw=document.getElementById('fw'),fwc=fw.getContext('2d');
+let fp=[],fwrun=false,fwraf;
+function resizeFW(){fw.width=window.innerWidth;fw.height=window.innerHeight;}
+resizeFW();window.addEventListener('resize',resizeFW);
+function burst(){
+  const cols=["#FF3B3B","#FFD93D","#4CC9F0","#6BCB77","#C77DFF","#FF9F1C","#FF6BD6","#fff"];
+  const c=cols[Math.floor(Math.random()*cols.length)];
+  const x=50+Math.random()*(fw.width-100),y=fw.height*(.1+Math.random()*.5);
+  for(let i=0;i<65;i++){const a=Math.random()*Math.PI*2,s=2+Math.random()*6;fp.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,alpha:1,color:c,size:2+Math.random()*2.5,trail:[]});}
+}
+function startFW(){fwrun=true;fp=[];let last=0;
+  function loop(now){if(!fwrun)return;fwc.clearRect(0,0,fw.width,fw.height);
+    if(now-last>400){burst();last=now;}
+    for(let i=fp.length-1;i>=0;i--){const p=fp[i];
+      p.trail.push({x:p.x,y:p.y});if(p.trail.length>5)p.trail.shift();
+      p.trail.forEach((t,j)=>{fwc.globalAlpha=(j/p.trail.length)*p.alpha*.3;fwc.beginPath();fwc.arc(t.x,t.y,p.size*.5,0,Math.PI*2);fwc.fillStyle=p.color;fwc.fill();});
+      fwc.globalAlpha=p.alpha;fwc.beginPath();fwc.arc(p.x,p.y,p.size,0,Math.PI*2);fwc.fillStyle=p.color;fwc.fill();
+      p.x+=p.vx;p.y+=p.vy;p.vy+=.1;p.vx*=.98;p.vy*=.98;p.alpha-=.013;p.size*=.994;
+      if(p.alpha<=0)fp.splice(i,1);}
+    fwc.globalAlpha=1;fwraf=requestAnimationFrame(loop);}
+  requestAnimationFrame(loop);}
+function stopFW(){fwrun=false;cancelAnimationFrame(fwraf);fwc.clearRect(0,0,fw.width,fw.height);fp=[];}
+
+updateUI();drawWheel();
+</script>
+</body>
+</html>
